@@ -20,7 +20,8 @@ DarwinMess::DarwinMess(NodeHandle& node)
 	}
 	//pub_out_ = node.advertise<sensor_msgs::JointState>("/command_joint_states", 1000);
 	pub_out_ = node.advertise<sensor_msgs::JointState>("/robotis_mini/goal", 10);
-	sub_in_ = node.subscribe("/states_joint_states", 1000, &DarwinMess::callback_In, this);
+	//sub_in_ = node.subscribe("/states_joint_states", 1000, &DarwinMess::callback_In, this);
+	sub_in_ = node.subscribe("/robotis_mini/joint_states", 1000, &DarwinMess::callback_In, this);
 	thread_pub_ = new boost::thread(&DarwinMess::pub_out, this, pub_out_, rate);
 }
 

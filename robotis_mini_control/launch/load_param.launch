@@ -1,0 +1,9 @@
+<launch>
+  <!-- This param file is where any environment-agnostic (live or simulation)
+  configuration should be loaded, including controllers -->
+  <rosparam file="$(find robotis_mini_control)/config/robotis_mini_control.yaml" command="load"/>
+  <rosparam file="$(find robotis_mini_control)/config/robotis_mini_name_joint.yaml" command="load"/>
+
+ 
+</launch>
+
