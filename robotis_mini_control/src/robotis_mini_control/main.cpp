@@ -88,8 +88,26 @@ ros::Duration temps(dt);
 	ROS_INFO("r_motor_ankle = %f", -aTibia);
 	ROS_INFO("r_motor_foot = %f", a_foot_i);
 
-	//Place le robot à la position initiale permettant son pas
 
+
+	// Placer a zero
+	darwin.goalPos("l_hip_joint", 	0, 		  time_tot, rate);
+	darwin.goalPos("r_hip_joint", 	0, 		  time_tot, rate);
+	darwin.goalPos("l_thigh_joint", 0, 	  time_tot, rate);
+	darwin.goalPos("r_thigh_joint", 0, 	  time_tot, rate);
+	darwin.goalPos("l_knee_joint", 	0, 	  time_tot, rate);
+	darwin.goalPos("r_knee_joint", 	0, time_tot, rate);
+	darwin.goalPos("l_ankle_joint", 0, 	  time_tot, rate);
+	darwin.goalPos("r_ankle_joint", 0, 	  time_tot, rate);
+	darwin.goalPos("l_foot_joint",	0, 		  time_tot, rate);
+	darwin.goalPos("r_foot_joint", 	0, 		  time_tot, rate);
+
+
+	//darwin.goalPos("l_biceps_joint", 	0.75, 		  time_tot, rate);
+	darwin.goalPos("r_biceps_joint", 	0, 		  time_tot, rate);
+	time_tot.sleep();
+
+	//Place le robot à la position initiale permettant son pas
 	darwin.goalPos("l_hip_joint", 	-a_hip_i, 		  time_tot, rate);
 	darwin.goalPos("r_hip_joint", 	a_hip_i, 		  time_tot, rate);
 	darwin.goalPos("l_thigh_joint", -aThigh, 	  time_tot, rate);
@@ -103,7 +121,7 @@ ros::Duration temps(dt);
 
 
 	//darwin.goalPos("l_biceps_joint", 	0.75, 		  time_tot, rate);
-	darwin.goalPos("r_biceps_joint", 	-1.57, 		  time_tot, rate);
+	darwin.goalPos("r_biceps_joint", 	-1.2, 		  time_tot, rate);
 
 /*
 	darwin.goalPos("l_hip_joint", 	-a_hip_i, 		  time_tot, rate);
@@ -124,7 +142,7 @@ ros::Duration temps(dt);
 
 	test.sleep();
 	
-
+	return 0;
 
 	//Boucle permettant le pas 
  

@@ -21,6 +21,7 @@ if __name__=="__main__":
     
     if options.real:
         rospy.loginfo("Real Robot!")
+        
     else:
         rospy.loginfo("Simulated Robot!")    
         rospy.wait_for_service('/gazebo/unpause_physics')
@@ -53,11 +54,13 @@ if __name__=="__main__":
     msg.angular.z=0
     command_vel.publish(msg)
     
+    
+    #robotis_mini = RobotisMiniControlInterface(real_robot=True)
+
     #robotis_mini.set_walk_velocity(0,0,0)
 
     #robotis_mini.set_walk_velocity(0.2,0,0)
     #rospy.sleep(3)
-    #rospy.sleep(10000)
     #robotis_mini.set_walk_velocity(0,1,0)
     #rospy.sleep(3)
     #robotis_mini.set_walk_velocity(0,-1,0)

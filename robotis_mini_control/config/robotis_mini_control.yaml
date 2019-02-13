@@ -4,7 +4,7 @@ robotis_mini:
     p: 4.0
     i: 0.0
     d: 0.01
-    
+
   # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController

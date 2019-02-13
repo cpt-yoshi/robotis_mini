@@ -20,6 +20,7 @@ Date: 04/02/14
 #include <boost/thread/mutex.hpp>
 #include <cmath>
 
+
 using namespace std;
 
 class DarwinJoint
@@ -48,6 +49,7 @@ private:
 	bool stop_thread_; /* Bool for kill the thread */
 	bool first_msg;
 	int rate_;
+
 };
 
 #endif

@@ -18,7 +18,8 @@ DarwinMess::DarwinMess(NodeHandle& node)
 			joint_name_state_.clear();
 		}
 	}
-	pub_out_ = node.advertise<sensor_msgs::JointState>("/command_joint_states", 1000);
+	//pub_out_ = node.advertise<sensor_msgs::JointState>("/command_joint_states", 1000);
+	pub_out_ = node.advertise<sensor_msgs::JointState>("/robotis_mini/goal", 10);
 	sub_in_ = node.subscribe("/states_joint_states", 1000, &DarwinMess::callback_In, this);
 	thread_pub_ = new boost::thread(&DarwinMess::pub_out, this, pub_out_, rate);
 }
@@ -53,6 +54,10 @@ void DarwinMess::pub_out(Publisher pub_out, Rate rate)
 			msg_out.position.push_back(it->second);
 		}
 		pub_out.publish(msg_out);
+		// TODO remove
+		//ROS_INFO("name = %s", msg_out.name);
+		//ROS_INFO("position = %s", msg_out.position);
+
 		rate.sleep();
 		msg_out.name.clear();
 		msg_out.position.clear();

@@ -47,6 +47,7 @@ include_directories(
  add_executable(Robotis_Mini_Joint_Control_node src/robotis_mini_control/main.cpp)
  add_executable(Robotis_Mini_Joint_Trans_node src/robotis_mini_control/topic_trans.cpp)
  add_executable(Robotis_Mini_Joint_Commande_node src/robotis_mini_control/commande_darwin.cpp)
+ add_executable(Robotis_Mini_Send_Joint_Pos_node src/robotis_mini_control/send_joint_pos.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -60,6 +61,10 @@ include_directories(
    ${catkin_LIBRARIES}
  )
  target_link_libraries(Robotis_Mini_Joint_Commande_node robotis_mini_GEI744
+   ${catkin_LIBRARIES}
+ )
+ 
+ target_link_libraries(Robotis_Mini_Send_Joint_Pos_node robotis_mini_GEI744
    ${catkin_LIBRARIES}
  )
 

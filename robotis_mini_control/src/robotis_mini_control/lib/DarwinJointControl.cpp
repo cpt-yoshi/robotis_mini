@@ -72,8 +72,9 @@ void DarwinJointControl::setJoint(std::string joint_name, double joint_send_valu
 void DarwinJointControl::getNameOnScreen()
 {
 	std::map<std::string, DarwinJoint*>::iterator it;
-	for(it = joint_map_.begin(); it != joint_map_.end(); ++it)
+	/*for(it = joint_map_.begin(); it != joint_map_.end(); ++it)
 		ROS_INFO("Joint: %s", it->first.c_str());
+	*/
 }
 
 
