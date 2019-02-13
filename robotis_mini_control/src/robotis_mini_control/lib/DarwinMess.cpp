@@ -53,6 +53,8 @@ void DarwinMess::pub_out(Publisher pub_out, Rate rate)
 		{
 			msg_out.name.push_back(it->first);
 			msg_out.position.push_back(it->second);
+			ROS_INFO("name = %s", msg_out.name);
+			ROS_INFO("position = %f", msg_out.position);
 		}
 		pub_out.publish(msg_out);
 		// TODO remove

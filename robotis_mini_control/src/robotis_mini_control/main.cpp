@@ -123,7 +123,8 @@ ros::Duration temps(dt);
 	darwin.goalPos("l_foot_joint",	-a_foot_i, 		  time_tot, rate);
 	darwin.goalPos("r_foot_joint", 	a_foot_i, 		  time_tot, rate);
 
-
+	darwin.goalPos("r_biceps_joint", 	1.1, 		  time_tot, rate);
+	//darwin.goalPos("l_biceps_joint", 	1.5, 		  time_tot, rate);
 
 	time_tot.sleep();
 
@@ -150,10 +151,11 @@ ros::Duration temps(dt);
 			darwin.setJoint("r_knee_joint", z2);
 			darwin.setJoint("r_ankle_joint", z3);
 			darwin.setJoint("r_foot_joint", z4);
+			//darwin.setJoint("r_biceps_joint", -1.5);
 			temps.sleep();
 		}
 		
-	time_tot.sleep();
+	
 	return 0;
 
 
