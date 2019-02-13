@@ -1,0 +1,35 @@
+<launch>
+  <!-- This param file is where any environment-agnostic (live or simulation)
+  configuration should be loaded, including controllers -->
+  <rosparam file="$(find robotis_mini_control)/config/hardware.yaml" command="load"/>
+  <rosparam file="$(find robotis_mini_control)/config/controllers.yaml" command="load"/>
+  <rosparam file="$(find robotis_mini_control)/config/robotis_mini_name_joint.yaml" command="load"/>
+  <rosparam file="$(find robotis_mini_control)/config/joint_limits.yaml" command="load"/>
+
+  <node name="robotis_mini_hardware_interface" pkg="robotis_mini_hardware_interface" type="robotis_mini_hardware_interface_node" output="screen"/>
+
+  <!-- This node loads the controllers into a controller manager (real or simulated). The
+  controllers are defined in config/robotis_mini_control.yaml -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+      output="screen" ns="/robotis_mini"
+      args="l_shoulder_joint_position_controller 
+      r_shoulder_joint_position_controller 
+      l_biceps_joint_position_controller 
+      r_biceps_joint_position_controller 
+      l_elbow_joint_position_controller 
+      r_elbow_joint_position_controller 
+      l_hip_joint_position_controller 
+      r_hip_joint_position_controller 
+      l_thigh_joint_position_controller 
+      r_thigh_joint_position_controller 
+      l_knee_joint_position_controller 
+      r_knee_joint_position_controller 
+      l_ankle_joint_position_controller 
+      r_ankle_joint_position_controller 
+      l_foot_joint_position_controller 
+      r_foot_joint_position_controller 
+      joint_state_controller"/>
+
+</launch>
+
+
