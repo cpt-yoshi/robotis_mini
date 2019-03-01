@@ -28,9 +28,7 @@ class DarwinReadFile
 {
 public:
 	DarwinReadFile(string file_name);
-	double getTime(int line, int col);
-	double getN(int line, int col);
-	double getJoint(int line, int col);
+	double getTSV(int line, int col); // Tab-separated value
 private:
 	vector<vector<double> > joint_table_;
 };

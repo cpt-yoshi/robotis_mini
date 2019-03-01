@@ -19,7 +19,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Boost REQUIRED COMPONENTS system thread)
 
-catkin_python_setup()
 
 catkin_package(
 #  INCLUDE_DIRS include
@@ -37,7 +36,7 @@ include_directories(
 
 ## Declare a cpp library
  add_library(robotis_mini_GEI744
-	 src/robotis_mini_control/lib/DarwinJoint.cpp src/robotis_mini_control/lib/DarwinJointControl.cpp src/robotis_mini_control/lib/DarwinReadFile.cpp src/robotis_mini_control/lib/DarwinCallback.cpp src/robotis_mini_control/lib/DarwinMess.cpp ${catkin_LIBRARIES}
+	 src/robotis_mini_control/lib/DarwinJoint.cpp src/robotis_mini_control/lib/DarwinJointControl.cpp src/robotis_mini_control/lib/DarwinReadFile.cpp src/robotis_mini_control/lib/DarwinCallback.cpp ${catkin_LIBRARIES}
  )
  target_link_libraries(robotis_mini_GEI744
 	${catkin_LIBRARIES}
@@ -45,9 +44,7 @@ include_directories(
 
 ## Declare a cpp executable
  add_executable(Robotis_Mini_Joint_Control_node src/robotis_mini_control/main.cpp)
- add_executable(Robotis_Mini_Joint_Trans_node src/robotis_mini_control/topic_trans.cpp)
- add_executable(Robotis_Mini_Joint_Commande_node src/robotis_mini_control/commande_darwin.cpp)
- add_executable(Robotis_Mini_Send_Joint_Pos_node src/robotis_mini_control/send_joint_pos.cpp)
+
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -57,14 +54,5 @@ include_directories(
  target_link_libraries(Robotis_Mini_Joint_Control_node robotis_mini_GEI744
    ${catkin_LIBRARIES}
  )
- target_link_libraries(Robotis_Mini_Joint_Trans_node robotis_mini_GEI744
-   ${catkin_LIBRARIES}
- )
- target_link_libraries(Robotis_Mini_Joint_Commande_node robotis_mini_GEI744
-   ${catkin_LIBRARIES}
- )
- 
- target_link_libraries(Robotis_Mini_Send_Joint_Pos_node robotis_mini_GEI744
-   ${catkin_LIBRARIES}
- )
+
 

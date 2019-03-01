@@ -51,7 +51,7 @@ void DarwinJoint::setJoint(double joint_send_value)
 	mutex_.lock();
 	send_value_ = joint_send_value;
 	mutex_.unlock();
-	//ROS_INFO("Joint %s just send: %f", darwin_joint_name_.c_str(), joint_send_value);
+	ROS_INFO("Joint %s just send: %f", darwin_joint_name_.c_str(), joint_send_value);
 }
 
 bool DarwinJoint::initEnd()
