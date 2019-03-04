@@ -33,20 +33,10 @@ DarwinReadFile::DarwinReadFile(string file_name)
 		ROS_ERROR("File not found");
 }
 
-double DarwinReadFile::getTime(int line, int col)
+double DarwinReadFile::getTSV(int line, int col)
 {
 	return joint_table_[line][col];
 }
 
-double DarwinReadFile::getJoint(int line, int col)
-{
-	return joint_table_[line][col];
-}
-
-
-double DarwinReadFile::getN(int line, int col)
-{
-	return joint_table_[line][col];
-}
 
 
