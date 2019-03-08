@@ -12,7 +12,7 @@ Date: 05/02/14
 #include "ros/ros.h"
 #include "lib/DarwinJointControl.h"
 #include "lib/DarwinReadFile.h"
-
+#include "ros/package.h"
 /*
 	Joint : r_shoulder_joint, l_shoulder_joint, r_biceps_joint, l_biceps_joint, r_elbow_joint, l_elbow_joint, 
           r_hip_joint, l_hip_joint, r_thigh_joint, l_thigh_joint, r_knee_joint, l_knee_joint, 
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 
 
   // Ouverture du fichier contenant les joints
-  DarwinReadFile file("/home/biobot/Desktop/data.txt");
+  DarwinReadFile file("/home/biobot/.projects/ws/ros/catkin_ws/src/robotis_mini/robotis_mini_control/src/robotis_mini_control/data.txt");
 
   int    N  = file.getTSV(0, 0);  //Nombre d'itérations à faire
   double dt = file.getTSV(1, 0);  //Periode d'échantillonage
@@ -56,24 +56,50 @@ int main(int argc, char **argv)
   const double L_thigh = 0.045;
   const double L_tibia = 0.042;
   const double L_foot  = 0.031;
-  const double Lx_knee = 0.04;
+  const double Lx_knee = 0.03;
 
   // Joints initiales
+  const double aThigh = 0.3*atan(Lx_knee/L_thigh);
+  const double aTibia = atan(Lx_knee/L_tibia);
+
   const double theta1_i = -0.45;
-  const double theta2_i = 0;
-  const double theta3_i = atan(Lx_knee/L_tibia);
-  const double theta4_i = theta3_i;
+  const double theta2_i = aThigh;
+  const double theta3_i = aThigh + aTibia;
+  const double theta4_i = aTibia;
   const double theta5_i = -0.45;
 
 
   ros::Duration tf(10); 
   ros::Rate rate(freq);
 
+  // Place le robot a son etat initial 0
+  /*
+  darwin.goalPos("r_hip_joint",   0.0, tf, rate);
+  darwin.goalPos("l_hip_joint",   0.0, tf, rate);
+  darwin.goalPos("r_thigh_joint", 0.0, tf, rate);
+  darwin.goalPos("l_thigh_joint", 0.0, tf, rate);
+  darwin.goalPos("r_knee_joint",  0.0, tf, rate);
+  darwin.goalPos("l_knee_joint",  0.0, tf, rate);
+  darwin.goalPos("r_ankle_joint", 0.0, tf, rate);
+  darwin.goalPos("l_ankle_joint", 0.0, tf, rate);
+  darwin.goalPos("r_foot_joint",  0.0, tf, rate);
+  darwin.goalPos("l_foot_joint",  0.0, tf, rate);
+
+  darwin.goalPos("r_elbow_joint",  0,      tf, rate);
+  darwin.goalPos("l_elbow_joint",  0,      tf, rate);
+  darwin.goalPos("r_biceps_joint", 0,      tf, rate);
+  darwin.goalPos("l_biceps_joint", 0,      tf, rate);
+  tf.sleep();
+
+  tf.sleep();
+  */
+
+
   // Place le robot a son etat initial (voir guide)
   darwin.goalPos("r_hip_joint",    theta1_i, tf, rate);
   darwin.goalPos("l_hip_joint",    theta1_i, tf, rate);
-  darwin.goalPos("r_thigh_joint",  theta2_i, tf, rate);
-  darwin.goalPos("l_thigh_joint", -theta2_i, tf, rate);
+  darwin.goalPos("r_thigh_joint", -theta2_i, tf, rate);
+  darwin.goalPos("l_thigh_joint",  theta2_i, tf, rate);
   darwin.goalPos("r_knee_joint",   theta3_i, tf, rate);
   darwin.goalPos("l_knee_joint",  -theta3_i, tf, rate);
   darwin.goalPos("r_ankle_joint",  theta4_i, tf, rate);
@@ -82,8 +108,12 @@ int main(int argc, char **argv)
   darwin.goalPos("l_foot_joint",   theta5_i, tf, rate);
 
   // Pour faciliter la lever du pied droit
+  
+  //darwin.goalPos("l_elbow_joint",  1,      tf, rate);
   darwin.goalPos("r_biceps_joint", -1.1,      tf, rate);
-
+  darwin.goalPos("r_elbow_joint", -0.8,      tf, rate);
+  //darwin.goalPos("l_biceps_joint", 1.3,      tf, rate);
+  tf.sleep();
   tf.sleep();
 
   // Faire la trajectoire issue de votre fichier (generer par MatLab)

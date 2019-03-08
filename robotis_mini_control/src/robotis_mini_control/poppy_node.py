@@ -28,7 +28,7 @@ def cubiq_interpol(qi, qf, tf, rate):
 
     dt = rate
     t = dt
-    N = int(math.ceil(tf/dt) -1)
+    N = int(math.floor(tf/dt))
     for i in range(N):
         q.append(a0 + a1*t + a2*t*t + a3*t*t*t)
         t = t +dt
@@ -116,22 +116,6 @@ class Driver:
         self.write_id = []
         self.write_pos = []
 
-        #self.joint-name = ['r_shoulder_joint',
-        #                   'l_shoulder_joint',
-        #                   'r_biceps_joint',
-        #                   'l_biceps_joint',
-        #                   'r_elbow_joint',
-        #                   'l_elbow_joint',
-        #                   'r_hip_joint',
-        #                   'l_hip_joint',
-        #                   'r_thigh_joint',
-        #                   'l_thigh_joint',
-        #                   'r_knee_joint',
-        #                   'l_knee_joint',
-        #                   'r_ankle_joint',
-        #                   'l_ankle_joint',
-        #                   'r_foot_joint',
-        #                   'l_foot_joint']
         # Connect to dynamixel motors
         ports = pypot.dynamixel.get_available_ports()
         print('available ports:', ports)
@@ -149,58 +133,61 @@ class Driver:
         self.ids = self.ids[:-1]
         print('Found ids:', self.ids)
 
-
         # Ros init
         rospy.init_node('poppy_node')
-        rate = rospy.Rate(50)
+        freq = 500.0
+        rate = rospy.Rate(freq)
 
-        pub = rospy.Publisher('/robotis_mini/joint_states', JointState, queue_size=10)
-        sub = rospy.Subscriber('/robotis_mini/goal', JointState, self.write)
 
-        torque_enabled = self.dxl_io.is_torque_enabled(self.ids)
-        for i in torque_enabled:
-            print(i)
+        # Set motor parameters
+        self.dxl_io.disable_torque(self.ids)
+        self.dxl_io.set_torque_limit(dict(zip(self.ids, itertools.repeat(100))))
+        self.dxl_io.set_max_torque(dict(zip(self.ids, itertools.repeat(100))))
 
-        print("-----------")
-        # Set motor specifications
-        self.dxl_io.set_max_torque(dict(zip(self.ids, itertools.repeat(1023))))
-        self.dxl_io.set_torque_limit(dict(zip(self.ids, itertools.repeat(1023))))
+        self.dxl_io.set_pid_gain(dict(zip(self.ids, itertools.repeat((4, 0, 0)))))
+
+        self.dxl_io.set_moving_speed(dict(zip(self.ids, itertools.repeat(0))))
+
         self.dxl_io.enable_torque(self.ids)
+        # Valis motor parameters
+        print("Validate messages")
 
-        torque_enabled = self.dxl_io.is_torque_enabled(self.ids)
-        for i in torque_enabled:
-            print(i)
+        while True:
+            try:
+                msg = self.dxl_io.get_torque_limit(self.ids)
+            except pypot.dynamixel.io.abstract_io.DxlTimeoutError:
+                pass
+            else:
+                break
+        print("Torque limit:")
+        for m in msg:
+            print('\t' + str(m))
 
-        print("-----------")
+        msg = self.dxl_io.get_max_torque(self.ids)
+        print("Max torque:")
+        for m in msg:
+            print('\t' + str(m))
 
-        ctrl_mode = self.dxl_io.get_control_mode(self.ids)
-        for i in ctrl_mode:
-            print(i)
+        msg = self.dxl_io.is_torque_enabled(self.ids)
+        print("Troque enabled:")
+        for m in msg:
+            print('\t' + str(m))
 
-        print("-----------")
-        print(dir(self.dxl_io))
-
-
-        self.dxl_io.set_pid_gain(dict(zip(self.ids, itertools.repeat((4, 0, 0.2)))))
-
-        slope = self.dxl_io.get_pid_gain(self.ids)
-        for i in slope:
-            print(i)
-
-        print("-----------")
-
-
-
-
-
-
+        msg = self.dxl_io.get_control_mode(self.ids)
+        print("Control mode:")
+        for m in msg:
+            print('\t' + str(m))
 
 
+        msg = self.dxl_io.get_pid_gain(self.ids)
+        print("PID:")
+        for m in msg:
+            print('\t' + str(m))
 
-        msg = JointState()
-        msg.name = ids_to_str(self.ids)
-        msg.velocity = []
-        msg.effort = []
+        msg = self.dxl_io.get_moving_speed(self.ids)
+        print("Moving speed:")
+        for m in msg:
+            print('\t' + str(m))
 
 
         qi_1 = self.dxl_io.get_present_position([1])
@@ -219,7 +206,7 @@ class Driver:
         qi_14 = self.dxl_io.get_present_position([14])
         qi_15 = self.dxl_io.get_present_position([15])
         qi_16 = self.dxl_io.get_present_position([16])
-
+        print("Postion get OK")
         qi_1 = qi_1[0]
         qi_2 = qi_2[0]
         qi_3 = qi_3[0]
@@ -239,26 +226,24 @@ class Driver:
 
         qf = 0
 
-        tf = 5
+        tf = 4
 
-
-        q1_list = cubiq_interpol(qi_1, qf, tf, 1.0/50.0)
-        q2_list = cubiq_interpol(qi_2, qf, tf, 1.0/50.0)
-        q3_list = cubiq_interpol(qi_3, qf, tf, 1.0/50.0)
-        q4_list = cubiq_interpol(qi_4, qf, tf, 1.0/50.0)
-        q5_list = cubiq_interpol(qi_5, qf, tf, 1.0/50.0)
-        q6_list = cubiq_interpol(qi_6, qf, tf, 1.0/50.0)
-        q7_list = cubiq_interpol(qi_7, qf, tf, 1.0/50.0)
-        q8_list = cubiq_interpol(qi_8, qf, tf, 1.0/50.0)
-        q9_list = cubiq_interpol(qi_9, qf, tf, 1.0/50.0)
-        q10_list = cubiq_interpol(qi_10, qf, tf, 1.0/50.0)
-        q11_list = cubiq_interpol(qi_11, qf, tf, 1.0/50.0)
-        q12_list = cubiq_interpol(qi_12, qf, tf, 1.0/50.0)
-        q13_list = cubiq_interpol(qi_13, qf, tf, 1.0/50.0)
-        q14_list = cubiq_interpol(qi_14, qf, tf, 1.0/50.0)
-        q15_list = cubiq_interpol(qi_15, qf, tf, 1.0/50.0)
-        q16_list = cubiq_interpol(qi_16, qf, tf, 1.0/50.0)
-
+        q1_list = cubiq_interpol(qi_1, qf, tf, 1.0/freq)
+        q2_list = cubiq_interpol(qi_2, qf, tf, 1.0/freq)
+        q3_list = cubiq_interpol(qi_3, qf, tf, 1.0/freq)
+        q4_list = cubiq_interpol(qi_4, qf, tf, 1.0/freq)
+        q5_list = cubiq_interpol(qi_5, qf, tf, 1.0/freq)
+        q6_list = cubiq_interpol(qi_6, qf, tf, 1.0/freq)
+        q7_list = cubiq_interpol(qi_7, qf, tf, 1.0/freq)
+        q8_list = cubiq_interpol(qi_8, qf, tf, 1.0/freq)
+        q9_list = cubiq_interpol(qi_9, qf, tf, 1.0/freq)
+        q10_list = cubiq_interpol(qi_10, qf, tf, 1.0/freq)
+        q11_list = cubiq_interpol(qi_11, qf, tf, 1.0/freq)
+        q12_list = cubiq_interpol(qi_12, qf, tf, 1.0/freq)
+        q13_list = cubiq_interpol(qi_13, qf, tf, 1.0/freq)
+        q14_list = cubiq_interpol(qi_14, qf, tf, 1.0/freq)
+        q15_list = cubiq_interpol(qi_15, qf, tf, 1.0/freq)
+        q16_list = cubiq_interpol(qi_16, qf, tf, 1.0/freq)
         while q1_list:
             q1 = q1_list.pop(0)
             q2 = q2_list.pop(0)
@@ -280,9 +265,13 @@ class Driver:
             #print("q1 = ", q1)
             #print("q2 = ", q2)
             #print("q3 = ", q3)
+            #t_old = rospy.Time.now()
             self.dxl_io.set_goal_position({1:q1, 2:q2, 3:q3, 4:q4, 5:q5, 6:q6, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
+            #t = rospy.Time.now()
+            #print(t.to_sec())
+            #print(t.to_sec() - t_old.to_sec())
+            #t_old = t;
             rate.sleep()
-
         # Be sure that
         self.dxl_io.set_goal_position({1:q1, 2:q2, 3:q3, 4:q4, 5:q5, 6:q6, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
         rate.sleep()
@@ -297,11 +286,11 @@ class Driver:
         hipOffsetX = .015;  #OP, Calculated from spec
         thighLength = .045; #OP, spec
         tibiaLength = .042; #OP, spec
-        footHeight = .0246; #OP, spec
-        kneeOffsetX = 0.04; #This parameter can be modified
+        footHeight = .031; #OP, spec
+        kneeOffsetX = 0.03; #This parameter can be modified
 
         dThigh = thighLength
-        aThigh = 0;
+        aThigh = 0.3*math.atan(kneeOffsetX/thighLength)
         dTibia = tibiaLength
         aTibia = math.atan(kneeOffsetX/tibiaLength)
         a_hip_i = 0.45;
@@ -326,21 +315,25 @@ class Driver:
         qi_16 = q16
 
 
-        tf = 10
 
-
-        q7_list = cubiq_interpol(qi_7,   math.degrees(-a_hip_i), tf, 1.0/50.0)
-        q8_list = cubiq_interpol(qi_8,   math.degrees(-a_hip_i), tf, 1.0/50.0)
-        q9_list = cubiq_interpol(qi_9,   math.degrees(aThigh), tf, 1.0/50.0)
-        q10_list = cubiq_interpol(qi_10, math.degrees(-aThigh), tf, 1.0/50.0)
-        q11_list = cubiq_interpol(qi_11, math.degrees((aThigh+aTibia)), tf, 1.0/50.0)
-        q12_list = cubiq_interpol(qi_12, math.degrees(-(aThigh+aTibia)), tf, 1.0/50.0)
-        q13_list = cubiq_interpol(qi_13, math.degrees(aTibia), tf, 1.0/50.0)
-        q14_list = cubiq_interpol(qi_14, math.degrees(-aTibia), tf, 1.0/50.0)
-        q15_list = cubiq_interpol(qi_15, math.degrees(-a_foot_i), tf, 1.0/50.0)
-        q16_list = cubiq_interpol(qi_16, math.degrees(-a_foot_i), tf, 1.0/50.0)
+        q3_list = cubiq_interpol(qi_3,   math.degrees(1.1), tf, 1.0/freq)
+        #q4_list = cubiq_interpol(qi_4,   math.degrees(1.1), tf, 1.0/freq)
+        q5_list = cubiq_interpol(qi_5,   math.degrees(0.8), tf, 1.0/freq)
+        q7_list = cubiq_interpol(qi_7,   math.degrees(-a_hip_i), tf, 1.0/freq)
+        q8_list = cubiq_interpol(qi_8,   math.degrees(-a_hip_i), tf, 1.0/freq)
+        q9_list = cubiq_interpol(qi_9,   math.degrees(-aThigh), tf, 1.0/freq)
+        q10_list = cubiq_interpol(qi_10, math.degrees(aThigh), tf, 1.0/freq)
+        q11_list = cubiq_interpol(qi_11, math.degrees((aThigh+aTibia)), tf, 1.0/freq)
+        q12_list = cubiq_interpol(qi_12, math.degrees(-(aThigh+aTibia)), tf, 1.0/freq)
+        q13_list = cubiq_interpol(qi_13, math.degrees(aTibia), tf, 1.0/freq)
+        q14_list = cubiq_interpol(qi_14, math.degrees(-aTibia), tf, 1.0/freq)
+        q15_list = cubiq_interpol(qi_15, math.degrees(-a_foot_i), tf, 1.0/freq)
+        q16_list = cubiq_interpol(qi_16, math.degrees(-a_foot_i), tf, 1.0/freq)
 
         while q7_list:
+            q3 = q3_list.pop(0)
+            #q4 = q4_list.pop(0)
+            q5 = q5_list.pop(0)
             q7 = q7_list.pop(0)
             q8 = q8_list.pop(0)
             q9 = q9_list.pop(0)
@@ -355,8 +348,11 @@ class Driver:
             #print("q1 = ", q1)
             #print("q2 = ", q2)
             #print("q3 = ", q3)
-            self.dxl_io.set_goal_position({7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
+            self.dxl_io.set_goal_position({3:q3, 5:q5, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
             rate.sleep()
+
+        otherRate = rospy.Rate(0.25)
+        otherRate.sleep();
 
         # Be sure that
         self.dxl_io.set_goal_position({7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
@@ -364,10 +360,11 @@ class Driver:
         self.dxl_io.set_goal_position({7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
         rate.sleep()
 
+        #rate = rospy.Rate(freq)
 
         # With jacobian
-        self.dxl_io.set_max_torque(dict(zip([8, 10, 12, 14, 16], itertools.repeat(1023))))
-        self.dxl_io.set_torque_limit(dict(zip([8, 10, 12, 14, 16], itertools.repeat(1023))))
+        #self.dxl_io.set_max_torque(dict(zip([8, 10, 12, 14, 16], itertools.repeat(1023))))
+        #self.dxl_io.set_torque_limit(dict(zip([8, 10, 12, 14, 16], itertools.repeat(1023))))
         self.dxl_io.enable_torque([8, 10, 12, 14, 16])
         q7_l = []
         q9_l = []
@@ -376,20 +373,28 @@ class Driver:
         q15_l = []
 
         ctr = 0
-        with open("data.txt") as tsv:
+        with open("/home/biobot/.projects/ws/ros/catkin_ws/src/robotis_mini/robotis_mini_control/src/robotis_mini_control/data.txt") as tsv:
             for line in csv.reader(tsv, delimiter='\t'):
                 if ctr == 0:
                     ctr += 1
                     N = float(line[0])
+                    print("N = %", N)
                 elif ctr ==  1:
                     ctr += 1
+                    dt = 1.0/float(line[0])
+                    print("dt = %", dt)
+                    ros_dt = rospy.Rate(dt)
                 else:
-                    q7_l.append( math.degrees(float(line[1])))
-                    q9_l.append( math.degrees(float(line[2])))
-                    q11_l.append(math.degrees(float(line[3])))
-                    q13_l.append(math.degrees(float(line[4])))
-                    q15_l.append(math.degrees(float(line[5])))
-
+                    q7_l.append( math.degrees(float(line[0])))
+                    q9_l.append( math.degrees(float(line[1])))
+                    q11_l.append(math.degrees(float(line[2])))
+                    q13_l.append(math.degrees(float(line[3])))
+                    q15_l.append(math.degrees(float(line[4])))
+        q8 = self.dxl_io.get_present_position([8])[0]
+        q10 = self.dxl_io.get_present_position([10])[0]
+        q12 = self.dxl_io.get_present_position([12])[0]
+        q14 = self.dxl_io.get_present_position([14])[0]
+        q16 = self.dxl_io.get_present_position([16])[0]
 
         print(N)
         while q7_l:
@@ -402,8 +407,10 @@ class Driver:
             #print("q1 = ", q1)
             #print("q2 = ", q2)
             #print("q3 = ", q3)
+            #self.dxl_io.set_goal_position({7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
+            #self.dxl_io.set_goal_position({7:q7, 8:q8[0], 9:q9, 11:q11, 13:q13, 15:q15})
             self.dxl_io.set_goal_position({7:q7, 9:q9, 11:q11, 13:q13, 15:q15})
-            rate.sleep()
+            ros_dt.sleep()
 
         # Be sure that
         self.dxl_io.set_goal_position({7:q7, 9:q9, 11:q11, 13:q13, 15:q15})

@@ -4,7 +4,10 @@ robotis_mini:
     p: 4.0
     i: 0.0
     d: 0.01
-
+  pid_params: &id002
+    p: 4
+    i: 0.0
+    d: 0.01
   # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController
@@ -38,7 +41,7 @@ robotis_mini:
   l_hip_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: l_hip_joint
-    pid: *id001
+    pid: *id002
   r_hip_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: r_hip_joint
@@ -46,7 +49,7 @@ robotis_mini:
   l_thigh_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: l_thigh_joint
-    pid: *id001
+    pid: *id002
   r_thigh_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: r_thigh_joint
@@ -54,7 +57,7 @@ robotis_mini:
   l_knee_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: l_knee_joint
-    pid: *id001
+    pid: *id002
   r_knee_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: r_knee_joint
@@ -62,7 +65,7 @@ robotis_mini:
   l_ankle_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: l_ankle_joint
-    pid: *id001
+    pid: *id002
   r_ankle_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: r_ankle_joint
@@ -70,7 +73,7 @@ robotis_mini:
   l_foot_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: l_foot_joint
-    pid: *id001
+    pid: *id002
   r_foot_joint_position_controller:
     type: effort_controllers/JointPositionController
     joint: r_foot_joint
