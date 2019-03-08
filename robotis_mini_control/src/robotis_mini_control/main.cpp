@@ -44,8 +44,8 @@ int main(int argc, char **argv)
 
   /* Example */
   /*
-  // Ouverture du fichier contenant les joints
-  DarwinReadFile file("/home/biobot/Desktop/data.txt");
+  // Ouverture du fichier contenant les joints, la fréquence d'échantillonage et le nombre d'échantillons
+  DarwinReadFile file("/home/utilisateur/nom_fichier.txt");
 
   double N  = file.getTSV(0, 0);  //Nombre d'itérations à faire
   double dt = file.getTSV(1, 0);  //Periode d'échantillonage
@@ -57,19 +57,22 @@ int main(int argc, char **argv)
   ...
 
   // Joints initiales
+  const double aThigh = 0.3*atan(Lx_knee/L_thigh);
+  const double aTibia = atan(Lx_knee/L_tibia);
+
   const double theta1_i = -0.45;
-  const double theta2_i = 0;
+  const double theta2_i = aThigh;
   ...
 
 
   ros::Duration tf(10); 
   ros::Rate rate(freq);
 
-  // Place le robot a son etat initial (voir guide)
+  // Place le robot a son etat initial (voir guide sur la problématique)
   darwin.goalPos("r_hip_joint",    theta1_i, tf, rate);
   darwin.goalPos("l_hip_joint",    theta1_i, tf, rate);
-  darwin.goalPos("r_thigh_joint",  theta2_i, tf, rate);
-  darwin.goalPos("l_thigh_joint", -theta2_i, tf, rate);
+  darwin.goalPos("r_thigh_joint", -theta2_i, tf, rate);
+  darwin.goalPos("l_thigh_joint",  theta2_i, tf, rate);
   darwin.goalPos("r_knee_joint",   theta3_i, tf, rate);
   darwin.goalPos("l_knee_joint",  -theta3_i, tf, rate);
   darwin.goalPos("r_ankle_joint",  theta4_i, tf, rate);
@@ -77,8 +80,9 @@ int main(int argc, char **argv)
   darwin.goalPos("r_foot_joint",   theta5_i, tf, rate);
   darwin.goalPos("l_foot_joint",   theta5_i, tf, rate);
 
-  // Pour faciliter la lever du pied droit
-  darwin.goalPos("r_biceps_joint", 1.1,      tf, rate);
+  // Pour avoir une inertie plus au centre du robot
+  darwin.goalPos("r_biceps_joint", -1.1, tf, rate);
+  darwin.goalPos("r_elbow_joint",  -0.8, tf, rate);
 
   tf.sleep();
 
