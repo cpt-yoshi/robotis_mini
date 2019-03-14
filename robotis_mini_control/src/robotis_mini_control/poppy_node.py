@@ -34,87 +34,10 @@ def cubiq_interpol(qi, qf, tf, rate):
         t = t +dt
     return q
 
-def joint_to_id(joint):
-    if (joint == 'r_shoulder_joint'):
-        return 1
-    elif (joint == 'l_shoulder_joint'):
-        return 2
-    elif (joint == 'r_biceps_joint'):
-        return 3
-    elif (joint == 'l_biceps_joint'):
-        return 4
-    elif (joint == 'r_elbow_joint'):
-        return 5
-    elif (joint == 'l_elbow_joint'):
-        return 6
-    elif (joint == 'r_hip_joint'):
-        return 7
-    elif (joint == 'l_hip_joint'):
-        return 8
-    elif (joint == 'r_thigh_joint'):
-        return 9
-    elif (joint == 'l_thigh_joint'):
-        return 10
-    elif (joint == 'r_knee_joint'):
-        return 11
-    elif (joint == 'l_knee_joint'):
-        return 12
-    elif (joint == 'r_ankle_joint'):
-        return 13
-    elif (joint == 'l_ankle_joint'):
-        return 14
-    elif (joint == 'r_foot_joint'):
-        return 15
-    elif (joint == 'l_foot_joint'):
-        return 16
-    else:
-        rospy.logerr('Joint name %d not valid', joint)
-
-def ids_to_str(ids):
-    id_str = []
-    for id in ids:
-        if (id == 1):
-            id_str.append('r_shoulder_joint')
-        elif (id == 2):
-            id_str.append('l_shoulder_joint')
-        elif (id == 3):
-            id_str.append('r_biceps_joint')
-        elif (id == 4):
-            id_str.append('l_biceps_joint')
-        elif (id == 5):
-            id_str.append('r_elbow_joint')
-        elif (id == 6):
-            id_str.append('l_elbow_joint')
-        elif (id == 7):
-            id_str.append('r_hip_joint')
-        elif (id == 8):
-            id_str.append('l_hip_joint')
-        elif (id == 9):
-            id_str.append('r_thigh_joint')
-        elif (id == 10):
-            id_str.append('l_thigh_joint')
-        elif (id == 11):
-            id_str.append('r_knee_joint')
-        elif (id == 12):
-            id_str.append('l_knee_joint')
-        elif (id == 13):
-            id_str.append('r_ankle_joint')
-        elif (id == 14):
-            id_str.append('l_ankle_joint')
-        elif (id == 15):
-            id_str.append('r_foot_joint')
-        elif (id == 16):
-            id_str.append('l_foot_joint')
-        else:
-            rospy.logerr('ID %d not valid', id)
-    return id_str
 
 class Driver:
 
     def __init__(self):
-        self.lock = threading.Lock()
-        self.write_id = []
-        self.write_pos = []
 
         # Connect to dynamixel motors
         ports = pypot.dynamixel.get_available_ports()
@@ -168,10 +91,18 @@ class Driver:
         for m in msg:
             print('\t' + str(m))
 
-        msg = self.dxl_io.is_torque_enabled(self.ids)
-        print("Troque enabled:")
-        for m in msg:
-            print('\t' + str(m))
+        while True:
+            msg = self.dxl_io.is_torque_enabled(self.ids)
+            print("Troque enabled:")
+            flag = False
+            for m in msg:
+                print('\t' + str(m))
+                if not m:
+                    flag =  True
+            if flag:
+                self.dxl_io.enable_torque(self.ids)
+            else:
+                break
 
         msg = self.dxl_io.get_control_mode(self.ids)
         print("Control mode:")
@@ -190,43 +121,26 @@ class Driver:
             print('\t' + str(m))
 
 
-        qi_1 = self.dxl_io.get_present_position([1])
-        qi_2 = self.dxl_io.get_present_position([2])
-        qi_3 = self.dxl_io.get_present_position([3])
-        qi_4 = self.dxl_io.get_present_position([4])
-        qi_5 = self.dxl_io.get_present_position([5])
-        qi_6 = self.dxl_io.get_present_position([6])
-        qi_7 = self.dxl_io.get_present_position([7])
-        qi_8 = self.dxl_io.get_present_position([8])
-        qi_9 = self.dxl_io.get_present_position([9])
-        qi_10 = self.dxl_io.get_present_position([10])
-        qi_11 = self.dxl_io.get_present_position([11])
-        qi_12 = self.dxl_io.get_present_position([12])
-        qi_13 = self.dxl_io.get_present_position([13])
-        qi_14 = self.dxl_io.get_present_position([14])
-        qi_15 = self.dxl_io.get_present_position([15])
-        qi_16 = self.dxl_io.get_present_position([16])
-        print("Postion get OK")
-        qi_1 = qi_1[0]
-        qi_2 = qi_2[0]
-        qi_3 = qi_3[0]
-        qi_4 = qi_4[0]
-        qi_5 = qi_5[0]
-        qi_6 = qi_6[0]
-        qi_7 = qi_7[0]
-        qi_8 = qi_8[0]
-        qi_9 = qi_9[0]
-        qi_10 = qi_10[0]
-        qi_11 = qi_11[0]
-        qi_12 = qi_12[0]
-        qi_13 = qi_13[0]
-        qi_14 = qi_14[0]
-        qi_15 = qi_15[0]
-        qi_16 = qi_16[0]
+        qi_1 = self.dxl_io.get_present_position([1])[0]
+        qi_2 = self.dxl_io.get_present_position([2])[0]
+        qi_3 = self.dxl_io.get_present_position([3])[0]
+        qi_4 = self.dxl_io.get_present_position([4])[0]
+        qi_5 = self.dxl_io.get_present_position([5])[0]
+        qi_6 = self.dxl_io.get_present_position([6])[0]
+        qi_7 = self.dxl_io.get_present_position([7])[0]
+        qi_8 = self.dxl_io.get_present_position([8])[0]
+        qi_9 = self.dxl_io.get_present_position([9])[0]
+        qi_10 = self.dxl_io.get_present_position([10])[0]
+        qi_11 = self.dxl_io.get_present_position([11])[0]
+        qi_12 = self.dxl_io.get_present_position([12])[0]
+        qi_13 = self.dxl_io.get_present_position([13])[0]
+        qi_14 = self.dxl_io.get_present_position([14])[0]
+        qi_15 = self.dxl_io.get_present_position([15])[0]
+        qi_16 = self.dxl_io.get_present_position([16])[0]
 
         qf = 0
 
-        tf = 4
+        tf = 5
 
         q1_list = cubiq_interpol(qi_1, qf, tf, 1.0/freq)
         q2_list = cubiq_interpol(qi_2, qf, tf, 1.0/freq)
@@ -262,23 +176,16 @@ class Driver:
             q15 = q15_list.pop(0)
             q16 = q16_list.pop(0)
 
-            #print("q1 = ", q1)
-            #print("q2 = ", q2)
-            #print("q3 = ", q3)
-            #t_old = rospy.Time.now()
             self.dxl_io.set_goal_position({1:q1, 2:q2, 3:q3, 4:q4, 5:q5, 6:q6, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
-            #t = rospy.Time.now()
-            #print(t.to_sec())
-            #print(t.to_sec() - t_old.to_sec())
-            #t_old = t;
             rate.sleep()
+
         # Be sure that
-        self.dxl_io.set_goal_position({1:q1, 2:q2, 3:q3, 4:q4, 5:q5, 6:q6, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
-        rate.sleep()
-        self.dxl_io.set_goal_position({1:q1, 2:q2, 3:q3, 4:q4, 5:q5, 6:q6, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
-        rate.sleep()
+        for i in range(50):
+            self.dxl_io.set_goal_position({1:q1, 2:q2, 3:q3, 4:q4, 5:q5, 6:q6, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
+            rate.sleep()
 
 
+        rospy.sleep(5)
 
         # Inital movement
         hipOffsetY = .024;  #OP, measured
@@ -297,24 +204,25 @@ class Driver:
         a_foot_i = 0.45;
 
 
-        qi_1 = q1
-        qi_2 = q2
-        qi_3 = q3
-        qi_4 = q4
-        qi_5 = q5
-        qi_6 = q6
-        qi_7 = q7
-        qi_8 = q8
-        qi_9 = q9
-        qi_10 = q10
-        qi_11 = q11
-        qi_12 = q12
-        qi_13 = q13
-        qi_14 = q14
-        qi_15 = q15
-        qi_16 = q16
+        qi_1 = self.dxl_io.get_present_position([1])[0]
+        qi_2 = self.dxl_io.get_present_position([2])[0]
+        qi_3 = self.dxl_io.get_present_position([3])[0]
+        qi_4 = self.dxl_io.get_present_position([4])[0]
+        qi_5 = self.dxl_io.get_present_position([5])[0]
+        qi_6 = self.dxl_io.get_present_position([6])[0]
+        qi_7 = self.dxl_io.get_present_position([7])[0]
+        qi_8 = self.dxl_io.get_present_position([8])[0]
+        qi_9 = self.dxl_io.get_present_position([9])[0]
+        qi_10 = self.dxl_io.get_present_position([10])[0]
+        qi_11 = self.dxl_io.get_present_position([11])[0]
+        qi_12 = self.dxl_io.get_present_position([12])[0]
+        qi_13 = self.dxl_io.get_present_position([13])[0]
+        qi_14 = self.dxl_io.get_present_position([14])[0]
+        qi_15 = self.dxl_io.get_present_position([15])[0]
+        qi_16 = self.dxl_io.get_present_position([16])[0]
 
 
+        tf = 5
 
         q3_list = cubiq_interpol(qi_3,   math.degrees(1.1), tf, 1.0/freq)
         #q4_list = cubiq_interpol(qi_4,   math.degrees(1.1), tf, 1.0/freq)
@@ -351,21 +259,14 @@ class Driver:
             self.dxl_io.set_goal_position({3:q3, 5:q5, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
             rate.sleep()
 
-        otherRate = rospy.Rate(0.25)
-        otherRate.sleep();
+        for i in range(100):
+            self.dxl_io.set_goal_position({1:q1, 2:q2, 3:q3, 4:q4, 5:q5, 6:q6, 7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
+            rate.sleep()
 
-        # Be sure that
-        self.dxl_io.set_goal_position({7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
-        rate.sleep()
-        self.dxl_io.set_goal_position({7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
-        rate.sleep()
+        rospy.sleep(5)
 
-        #rate = rospy.Rate(freq)
 
-        # With jacobian
-        #self.dxl_io.set_max_torque(dict(zip([8, 10, 12, 14, 16], itertools.repeat(1023))))
-        #self.dxl_io.set_torque_limit(dict(zip([8, 10, 12, 14, 16], itertools.repeat(1023))))
-        self.dxl_io.enable_torque([8, 10, 12, 14, 16])
+        # Quasi-static step
         q7_l = []
         q9_l = []
         q11_l = []
@@ -404,87 +305,21 @@ class Driver:
             q13 = q13_l.pop(0)
             q15 = q15_l.pop(0)
 
-            #print("q1 = ", q1)
-            #print("q2 = ", q2)
-            #print("q3 = ", q3)
             #self.dxl_io.set_goal_position({7:q7, 8:q8, 9:q9, 10:q10, 11:q11, 12:q12, 13:q13, 14:q14, 15:q15, 16:q16})
             #self.dxl_io.set_goal_position({7:q7, 8:q8[0], 9:q9, 11:q11, 13:q13, 15:q15})
             self.dxl_io.set_goal_position({7:q7, 9:q9, 11:q11, 13:q13, 15:q15})
             ros_dt.sleep()
 
         # Be sure that
-        self.dxl_io.set_goal_position({7:q7, 9:q9, 11:q11, 13:q13, 15:q15})
-        rate.sleep()
-        self.dxl_io.set_goal_position({7:q7, 9:q9, 11:q11, 13:q13, 15:q15})
-        rate.sleep()
-
-
-
-
-        exit()
-
-        # Loop
-        while not rospy.is_shutdown():
-            # Update jointState
-            msg.position = []
-
-            flag = True
-            while flag:
-                try:
-                    pos = self.dxl_io.get_present_position(self.ids)
-                    for p in pos:
-                        msg.position.append(math.radians(p))
-                    msg.header.stamp = rospy.Time.now()
-                    pub.publish(msg)
-                    flag = False
-                except pypot.dynamixel.io.abstract_io.DxlCommunicationError:
-                    print("Error occured")
-                    pass
-            flag = True
-            while flag:
-                try:
-
-                    self.lock.acquire()
-                    if self.write_id:
-                        write_id = self.write_id.pop(0)
-                        write_pos = self.write_pos.pop(0)
-                        self.lock.release()
-                        self.dxl_io.set_goal_position(dict(zip(write_id, write_pos)), sync_write=True)
-                        flag = False
-                    else:
-                        self.lock.release()
-                except pypot.dynamixel.io.abstract_io.DxlCommunicationError:
-                    pass
-                finally:
-                    flag = False
-
-
+        for i in range(50):
+            self.dxl_io.set_goal_position({7:q7, 9:q9, 11:q11, 13:q13, 15:q15})
             rate.sleep()
 
 
-    def write(self, data):
-        pos = []
-        ids = []
-        if (len(data.position) == 16):
-            #print("Name = ", data.name[15])
-            for p in data.position:
-                print("p = ", p)
-                pos.append(math.degrees(p))
-            for name in data.name:
-                print("name = ", name)
-                print("id = ", joint_to_id(name))
-                ids.append(joint_to_id(name))
 
-            self.lock.acquire()
-            self.write_id.append(ids)
-            self.write_pos.append(pos)
-            self.lock.release()
 
-            #self.lock.acquire()
-            #try:
-            #self.dxl_io.set_goal_position(dict(zip(ids, pos)))
-            #finally:
-            #    self.lock.release()
+
+
 
 if __name__ == '__main__':
     try:
